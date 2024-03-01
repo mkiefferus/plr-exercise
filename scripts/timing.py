@@ -7,6 +7,7 @@ import time
 
 from plr_exercise.models.cnn import Net
 
+
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description="PyTorch MNIST Example")
