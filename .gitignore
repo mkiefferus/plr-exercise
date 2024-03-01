@@ -1,3 +1,5 @@
 /venv
 *.egg-info
 /results
+.DS_Store
+```
