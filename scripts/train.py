@@ -15,9 +15,24 @@ wandb.login()
 wandb.init(project="plr-intro-exercise", entity="kiema745", name="Optuna optimisation")
 
 
-def train(args, model, device, train_loader, optimizer, epoch):
-    """"
-    Train the model for one epoch
+def train(
+    args,
+    model: torch.nn.Module,
+    device: torch.device,
+    train_loader: torch.utils.data.DataLoader,
+    optimizer: torch.optim.Optimizer,
+    epoch: int,
+):
+    """
+    Trains the model for a single epoch
+
+    Parameters:
+    - args: Argument Parser containing training settings
+    - model: Neural net to be trained
+    - device: Device (CPU or GPU) to run the model on
+    - train_loader: Dataloader for the training dataset
+    - optimizer: Optimisation algorithm used for training
+    - epoch: Current epoch
     """
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -39,11 +54,23 @@ def train(args, model, device, train_loader, optimizer, epoch):
             )
             if args.dry_run:
                 break
-        
+
         wandb.log({"training_loss": loss.item()})
 
 
 def test(model, device, test_loader, epoch):
+    """
+    Evaluate model on test dataset
+
+    Parameters:
+    - model: Neural net to be evaluated
+    - device: Device (CPU or GPU) to run the model on
+    - test_loader: Dataloader for the test dataset
+    - epoch: Current epoch
+
+    Returns:
+    - loss (float): Average loss on the test dataset
+    """
     model.eval()
     test_loss = 0
     correct = 0
@@ -69,6 +96,18 @@ def test(model, device, test_loader, epoch):
 
 
 def train_model(trial, args, model, device):
+    """ 
+    Trains and evaluates the model using parameters from Optuna trial
+
+    Parameters:
+    - trial: Optuna trial object
+    - args: Argument Parser containing training settings
+    - model: Neural net to be trained and evaluated
+    - device: Device (CPU or GPU) to run the model on
+    
+    Returns:
+    -loss (float): Average evaluation loss of test dataset
+    """
     lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
     batch_size = trial.suggest_categorical("batch_size", [64, 128, 256])
     gamma = trial.suggest_float("gamma", 0.5, 0.9)
@@ -88,7 +127,6 @@ def train_model(trial, args, model, device):
     train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
-    
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=gamma)
@@ -102,6 +140,11 @@ def train_model(trial, args, model, device):
 
 
 def main():
+    """
+    Execute training and hyperparameter tuning for model on MNIST dataset
+
+    Parses command-line arguments for model training configuration
+    """
     # Training settings
     parser = argparse.ArgumentParser(description="PyTorch MNIST Example")
     parser.add_argument(
@@ -134,43 +177,21 @@ def main():
     else:
         device = torch.device("cpu")
 
-    # train_kwargs = {"batch_size": args.batch_size}
-    # test_kwargs = {"batch_size": args.test_batch_size}
-    # if use_cuda:
-    #     cuda_kwargs = {"num_workers": 1, "pin_memory": True, "shuffle": True}
-    #     train_kwargs.update(cuda_kwargs)
-    #     test_kwargs.update(cuda_kwargs)
-
-    # transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-    # dataset1 = datasets.MNIST("../data", train=True, download=True, transform=transform)
-    # dataset2 = datasets.MNIST("../data", train=False, transform=transform)
-    # train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
-    # test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
-
-    # model = Net().to(device)
-    # optimizer = optim.Adam(model.parameters(), lr=args.lr)
-
-    # scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    # for epoch in range(args.epochs):
-    #     train(args, model, device, train_loader, optimizer, epoch)
-    #     test(model, device, test_loader, epoch)
-    #     scheduler.step()
-
     # use Optuna to optimise
     model = Net().to(device)
 
     study = optuna.create_study(direction="minimize")
     study.optimize(lambda trial: train_model(trial, args, model, device), n_trials=10)
-    print(f'Best parameters: {study.best_params}')
-
+    print(f"Best parameters: {study.best_params}")
 
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
-        
+
         # log code artifact
         code_artifact = wandb.Artifact("training_script", type="code")
         code_artifact.add_file("scripts/train.py")
         wandb.log_artifact(code_artifact)
+
 
 if __name__ == "__main__":
     main()

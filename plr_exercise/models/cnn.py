@@ -5,6 +5,11 @@ import torch.nn.functional as F
 
 
 class Net(nn.Module):
+    """
+    Convolutional Neural Network for image classification
+
+    Activation function: ReLU 
+    """
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
@@ -16,7 +21,16 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(9216, 128)
         self.fc2 = nn.Linear(128, 10)
 
-    def forward(self, x):
+    def forward(self, x:torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass through network
+
+        Parameters:
+        - x: Input data
+
+        Returns:
+        - output: Predicted class probabilities
+        """
         x = self.conv1(x)
         x = F.relu(x)
         x = self.conv2(x)
