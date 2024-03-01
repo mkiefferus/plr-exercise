@@ -1,0 +1,45 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.3",
+    "heartbeatAt": "2024-03-01T11:20:11.938343",
+    "startedAt": "2024-03-01T11:20:11.247859",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "scripts/train.py",
+    "codePathLocal": "scripts/train.py",
+    "codePath": "scripts/train.py",
+    "git": {
+        "remote": "https://github.com/mkiefferus/plr-exercise",
+        "commit": "61d1429bf130ad7bd04c10ec8a361485124d678c"
+    },
+    "email": "max.kieffer@juliusbaer.com",
+    "root": "/Users/maxkieffer/Documents/GitHub/Perception and Learning for Robotics/plr-exercise",
+    "host": "MK-MacBook-Pro.fritz.box",
+    "username": "maxkieffer",
+    "executable": "/Users/maxkieffer/Documents/GitHub/Perception and Learning for Robotics/plr-exercise/venv/plr/bin/python3",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2300,
+        "min": 2300,
+        "max": 2300
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300,
+            "min": 2300,
+            "max": 2300
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 465.62699127197266,
+            "used": 11.326530456542969
+        }
+    },
+    "memory": {
+        "total": 32.0
+    }
+}
