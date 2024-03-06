@@ -2,4 +2,4 @@
 *.egg-info
 /results
 .DS_Store
-```
+/wandb

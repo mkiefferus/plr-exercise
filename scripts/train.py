@@ -8,10 +8,7 @@ from torch.optim.lr_scheduler import StepLR
 import wandb
 
 from plr_exercise.models.cnn import Net
-
-wandb.login()
-
-wandb.init(project="plr-intro-exercise", entity="kiema745")
+from plr_exercise import PLR_ROOT_DIR
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
@@ -87,6 +84,15 @@ def main():
     )
     parser.add_argument("--save-model", action="store_true", default=False, help="For Saving the current Model")
     args = parser.parse_args()
+
+    wandb.login()
+    wandb.init(project="plr-intro-exercise", 
+               entity="kiema745",
+               config=args,
+               dir=PLR_ROOT_DIR,
+               settings=wandb.Settings(code_dir=PLR_ROOT_DIR),
+               name="task3")
+
     use_cuda = not args.no_cuda and torch.cuda.is_available()
 
     torch.manual_seed(args.seed)
@@ -122,9 +128,9 @@ def main():
         torch.save(model.state_dict(), "mnist_cnn.pt")
         
         # log code artifact
-        code_artifact = wandb.Artifact("training_script", type="code")
-        code_artifact.add_file("scripts/train.py")
-        wandb.log_artifact(code_artifact)
+        # code_artifact = wandb.Artifact("training_script", type="code")
+        # code_artifact.add_file("scripts/train.py")
+        # wandb.log_artifact(code_artifact)
 
 if __name__ == "__main__":
     main()
